@@ -18,5 +18,12 @@ São eles:
 * PUT /users/:email =>mandando no body da requisição a senha atual e a nova senha para fazer a alteração
 * DELETE /users/:id
 
+## 🧪 Tecnologias
 
+Esse projeto foi desenvolvido com as seguintes tecnologias:
+
+- [NodeJs](https://nodejs.org)
+- [Express](https://expressjs.com/pt-br/)
+- [Typescript](https://www.typescriptlang.org)
+- [Supabase](https://app.supabase.io/)
 

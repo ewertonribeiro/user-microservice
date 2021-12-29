@@ -14,11 +14,16 @@ São eles:
 
 ### Usuários
 
-* GET /users/lisall
+* GET /users/listall
 * GET /users/:email
 * POST /users/create
-* PUT /users/:email =>mandando no body da requisição a senha atual e a nova senha para fazer a alteração
-* DELETE /users/:id
+* PUT /users/:id => mandando no body da requisição a senha atual e a nova senha para fazer a alteração e o Token nos headers
+* DELETE /users/:id => mandando no body da requisição a senha e o Token nos headers
+
+### Session
+
+* Post /session/create/:id
+* Put /session/:id => mandando no body da requisição a senha do usuário e o Token de Autenticação nos Headers
 
 ## 🧪 Tecnologias
 

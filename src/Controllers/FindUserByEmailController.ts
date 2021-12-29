@@ -16,7 +16,7 @@ export class FindUserByEmailController{
 
     const user = await this.FindUserByEmailUseCase.execute(email);
 
-    if(user.data?.length === 0){
+    if(!user){
         return res.json({error:"User not found"})
     }
     

@@ -15,7 +15,7 @@ class UserMidleware{
 
         const {data}= await Repository.findUserByEmail(email)
 
-       const userExists =  data?.find(user=>user.email)
+       const userExists =  data?.some(user=>user.email ===email)
 
         if(userExists){
 
@@ -29,12 +29,15 @@ async userDoesNotExists(req:Request , res:Response , next:NextFunction){
     const id = req.params.id
 
 
-    const {data}= await Repository.findUserById(id)
+    const user = await Repository.findUserById(id)
+ 
+    if(!user){
+        return res.status(400).json({Error:"User does not exists at UserMiddleware"})
+    }
 
+    if(user.id !== id){
 
-    if(!data){
-
-        return res.status(400).json({error:"User do not exists"})
+        return res.status(400).json({error:"User Invalid at UserMiddleware"})
     }
 
 

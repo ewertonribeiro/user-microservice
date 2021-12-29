@@ -14,6 +14,6 @@ export class ListAllUserController{
 
         const users = await this.ListAllUsersUseCase.execute();
 
-        return res.status(200).json(users.data)
+        return res.status(200).json(users)
     }
 }

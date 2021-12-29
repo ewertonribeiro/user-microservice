@@ -1,7 +1,6 @@
+import { IUser } from './../Models/IUserModel';
 import { UserRepository} from '../Repositories/IUserRepositoryImplementations';
-import { IUser } from '../Models/IUserModel';
-import { PostgrestResponse } from '@supabase/supabase-js';
-
+import { IResponseUser } from '../Interfaces/GlobalInterfaces';
 
 export class ListAllUsersUseCase{
 
@@ -10,12 +9,20 @@ export class ListAllUsersUseCase{
 
     }
 
-    async execute():Promise<PostgrestResponse<IUser[] | null>> {
+    async execute():Promise<IUser[] | null>{
 
-        const users = await this.UserRepository.listAll()
+        const {data}= await this.UserRepository.listAll()
 
+        const user = data?.find(user=>user)
+        
+        // const Response = {
+        //     email:user?.email,
+        //     name:user?.name,
+        //     lastname:user?.lastname,
+        //     token:user?.token
+        // } as IResponseUser
          
-        return users
+        return data
     }
 
 }

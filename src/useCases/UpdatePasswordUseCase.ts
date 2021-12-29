@@ -5,7 +5,7 @@ import { IUser } from '../Models/IUserModel';
 import { Password } from '../Functions/Password';
 
 interface IUpdatePassword{
-    email:string,
+    id:string,
     password:number,
     newpassword:number
 }
@@ -16,17 +16,17 @@ export class UpdatePasswordUseCase{
     constructor(private UserRepository:UserRepository){}
 
 
-    async execute({email ,newpassword , password}:IUpdatePassword):Promise<PostgrestResponse<IUser>>{
+    async execute({id ,newpassword , password}:IUpdatePassword):Promise<PostgrestResponse<IUser>>{
 
         const oldPass = password.toString()
         const newPass = newpassword.toString()
     
-       const {data} = await this.UserRepository.findUserByEmail(email)
+       const user = await this.UserRepository.findUserById(id)
     
-     const passHash =  data?.find(user=>user.password)
+     const passHash =  user?.password
     
     
-    const comparePass = await Password.Compare(oldPass , passHash?.password)
+    const comparePass = await Password.Compare(oldPass , passHash)
     
     if(!comparePass){
        throw new Error("Password invalid")
@@ -35,7 +35,7 @@ export class UpdatePasswordUseCase{
     const newHash = await Password.encrypt(newPass)
     
 
-   const newPassword = await this.UserRepository.updatePassword({email , oldPass:passHash?.password, newHash})
+   const newPassword = await this.UserRepository.updatePassword({id , oldPass:passHash, newHash})
 
         return newPassword
 

@@ -4,25 +4,38 @@ import { UpdatePasswordUseCase } from './../useCases/UpdatePasswordUseCase';
 import { IUser } from '../Models/IUserModel';
 
 interface IUpdatePassword{
-    email:string,
+    id:string,
     password:number,
     newpassword:number
 }
 
+interface IResponse{
+    name:string,
+    newpassword:string,
+    status:string
+}
 export class UpdatePasswordController{
 
 
     constructor(private UpdatePasswordUseCase:UpdatePasswordUseCase){}
 
 
-    async handle(req:Request<unknown> , res:Response):Promise<Response<IUser>>{
-        const {email} = req.params as IUpdatePassword
+    async handle(req:Request<unknown> , res:Response):Promise<Response<IResponse>>{
+        const {id} = req.params as IUpdatePassword
         const { password , newpassword} = req.body as IUpdatePassword
 
         try{
-            const Password = await this.UpdatePasswordUseCase.execute({email ,password , newpassword}) 
+            const response= await this.UpdatePasswordUseCase.execute({id ,password , newpassword}) 
 
-            return res.status(200).json(Password)
+            const user = response.data?.find(user=>user)
+
+            const Response = {
+                name:user?.name,
+                newpassword:user?.password,
+                status:response.statusText
+            } as IResponse
+
+            return res.status(200).json(Response)
         }
 
         catch(err){

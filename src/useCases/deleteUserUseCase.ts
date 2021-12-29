@@ -6,7 +6,7 @@ import { UserRepository } from './../Repositories/IUserRepositoryImplementations
 
 interface IUserToDelete {
     id:string,
-    password:number | string
+    password:number
 }
 
 export class DeleteUserUseCase{
@@ -16,22 +16,26 @@ export class DeleteUserUseCase{
 
 
     async execute({id , password}:IUserToDelete):Promise<PostgrestResponse<IUser>>{
-
-        const {data} = await this.UserRepository.findUserById(id)
+        const pass = password.toString()
         
-        const pass = data?.find(user=>user.password)
-
-        const passIsRigth = await Password.Compare(password , pass?.password)
-
-        if(!passIsRigth){
-            throw new Error("Passord invalid")
+        try{
+            const user = await this.UserRepository.findUserById(id);
+            
+            if(!user){
+                throw new Error("User does not exists!")
+            }
+        
+            const passIsRigth = await Password.Compare(pass , user?.password)
+    
+            if(!passIsRigth){
+                throw new Error("Passord invalid")
+            }
+    
+            const userToDelete = await this.UserRepository.deleteUser({id , password})
+            return userToDelete
         }
-
-        const userToDelete = await this.UserRepository.deleteUser({id , password})
-
-
-
-        return userToDelete
-
+        catch(err){
+            throw new Error(`${err}`)
+        }
     }
 }

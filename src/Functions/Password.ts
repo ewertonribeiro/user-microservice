@@ -1,16 +1,22 @@
 import { compare, hash } from 'bcrypt';
 
 export const Password = {
-    async Compare(password:number | string , hash:any):Promise<boolean>{
+    async Compare(password: string , hash:any):Promise<boolean>{
 
-        const pass = password.toString()
-        const encryped = hash as string
+        const pass = password
+        const passHash = hash as string
 
-        const ComprePassword = await compare(pass , encryped)
+        try{
+            const ComprePassword = await compare(pass , passHash)
+        
+        
+            return  ComprePassword
     
-    
 
-        return  ComprePassword
+        }
+        catch(err){
+            throw new Error(`${hash}`)
+        }
 
     },
 

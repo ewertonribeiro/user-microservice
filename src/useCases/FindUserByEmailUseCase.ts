@@ -1,6 +1,5 @@
-import { IUser } from './../Models/IUserModel';
 import { UserRepository} from '../Repositories/IUserRepositoryImplementations';
-import { PostgrestResponse } from '@supabase/supabase-js';
+import { IResponseUser } from '../Interfaces/GlobalInterfaces';
 
 
 export class FindUserByEmailUseCase{
@@ -10,11 +9,18 @@ export class FindUserByEmailUseCase{
 
     }
 
-    async execute(email:string):Promise<PostgrestResponse<IUser>> {
+    async execute(email:string):Promise<IResponseUser | null> {
 
-        const user = await this.UserRepository.findUserByEmail(email)
+        const {data} = await this.UserRepository.findUserByEmail(email)
 
-        return user
+        const user = data?.find(user=>user)
+        const Response = {
+            name:user?.name,
+            lastname:user?.lastname,
+            email:user?.email,
+            token:user?.token
+        } as IResponseUser
+        return Response
     }
 
 }

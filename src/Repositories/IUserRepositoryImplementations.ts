@@ -2,13 +2,10 @@ import { IUser } from './../Models/IUserModel';
 import { IUserRepositoryInterface } from './Interface/IUserRespository';
 import { supabase } from '../DB/InitDB';
 import { PostgrestResponse } from '@supabase/supabase-js';
-import { v4 as uuid } from 'uuid';
-import { IUpdatePassword } from './Interface/IUserRespository';
+import { IUpdatePassword  , } from './Interface/IUserRespository';
+import { JWT } from '../Functions/JWT';
+import { IUserToDelete} from '../Interfaces/GlobalInterfaces'
 
-interface IUserToDelete{
-    id:string,
-    password:number | string
-}
 
 
 export class UserRepository implements IUserRepositoryInterface{
@@ -27,25 +24,28 @@ export class UserRepository implements IUserRepositoryInterface{
 }
 
 
-    async listAll(): Promise<PostgrestResponse<IUser[]  | null >> {
+    async listAll(): Promise<PostgrestResponse<IUser>> {
         
-        const users = await supabase.from<IUser[]  | null>('Users')
+        const users = await supabase.from<IUser>('Users')
         .select("*")
 
         return users
     }
 
-    async createUser({ email, name, avatar, password }:IUser): Promise<PostgrestResponse<IUser>> {
+    async createUser({ email, name, avatar, password , lastname }:IUser): Promise<PostgrestResponse<IUser>> {
         
         const newUser = {} as IUser
 
+        const {userId , token} = JWT.SIGN()
+        
         Object.assign(newUser , {
-            id:uuid(),
+            id:userId,
             email:email,
             avatar,
-            name:name.firstname,
-            lastname:name.lastname,
-            password:password
+            name:name,
+            lastname:lastname,
+            password:password,
+            token:token
         })
 
         const user = await supabase.from<IUser>('Users')
@@ -67,37 +67,62 @@ export class UserRepository implements IUserRepositoryInterface{
         return user
     }
 
-    async updatePassword({ email,newHash , oldPass}:IUpdatePassword ): Promise<PostgrestResponse<IUser>> {
+    async updatePassword({ id,newHash , oldPass}:IUpdatePassword ): Promise<PostgrestResponse<IUser>> {
 
         const pass = oldPass as string
         const newPassword = await supabase.from<IUser>('Users')
         .update({password:newHash})
         .match({password:pass})
-        .eq("email" , email)
+        .eq("id" , id)
 
         return newPassword
 
     }
     async deleteUser({ id }: IUserToDelete): Promise<PostgrestResponse<IUser>> {
     
-        const user = await supabase.from<IUser>('Users')
-            .delete()
-            .match({id:id})
+        try{
 
-        return user
+            const user = await supabase.from<IUser>('Users')
+                .delete()
+                .match({id:id})
+    
+            return user
+        }
+        catch{
+            throw new Error(`Erro no repositorio`)
+        }
 
     }
 
-    async findUserById(id:string): Promise<PostgrestResponse<IUser>> {
+    async findUserById(id:string): Promise<IUser | undefined> {
         
-        const user = await supabase.from<IUser>('Users')
+        const {data} = await supabase.from<IUser>('Users')
         .select("*")
         .match({id:id})
 
-        
+        const user = data?.find(user=>user);
 
+        // const Response = {
+        //     name:user?.name,
+        //     lastname:user?.lastname,
+        //     email:user?.email,
+        //     token:user?.token,
+        //     id:user?.id
+        // } as IResponseUser;
+        
         return user
     }
 
+    async createSession(id: string): Promise<PostgrestResponse<IUser>> {
 
+        const newToken = JWT.SIGN(id)
+
+        const updated= await supabase.from<IUser>('Users')
+        .update({token:newToken.token})
+        .match({id:id})
+
+
+
+        return updated
+    }
 }

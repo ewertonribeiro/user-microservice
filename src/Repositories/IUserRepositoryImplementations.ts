@@ -125,4 +125,13 @@ export class UserRepository implements IUserRepositoryInterface{
 
         return updated
     }
+    async endSession(id: string): Promise<PostgrestResponse<IUser>> {
+        
+        const data = await supabase.from<IUser>("Users")
+        .update({token:null})
+        .match({id:id})
+
+        return data
+
+    }
 }

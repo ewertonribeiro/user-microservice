@@ -37,6 +37,10 @@ export const AuthMiddleware = {
                 return res.status(400).json("Token invalid")
             }
 
+            if(!user.token){
+                return res.status(400).json("This User does not have a token,you need to sign again!!!")
+            }
+
             next()
         }
         catch(err){

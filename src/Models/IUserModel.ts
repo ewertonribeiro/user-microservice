@@ -5,5 +5,5 @@ export interface IUser{
     email:string;
     password:number | string ;
     avatar?:string
-    token?:string
+    token?:string | null
 }

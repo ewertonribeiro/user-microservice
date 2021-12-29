@@ -24,7 +24,7 @@ export class CreateSessionUseCase{
 
             const user = await this.UserRepository.findUserById(id);
             
-            if(user ===undefined){
+            if(!user){
                 throw new Error("User does not exists!")
             }
         

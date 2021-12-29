@@ -11,6 +11,8 @@ import {DeleteUserUseCase as DeleteUseCase} from '../useCases/deleteUserUseCase'
 import {DeleteUserController as DeleteController} from './DeleteUserController'
 import { CreateSessionUseCase as SessionUseCase } from '../useCases/CreateSessionUseCase';
 import {CreateSessionController as SessionController} from './CreateSessionController'
+import { EndSessionUseCase as EndUseCase } from '../useCases/EndSessionUseCase';
+import { EndSessionController as EndController } from './EndSessionController';
 
 
 //Database 
@@ -51,4 +53,10 @@ const DeleteUserController = new DeleteController(DeleteUserUseCase)
 const CreateSessionUseCase = new SessionUseCase(UserRepositories)
 const CreateSessionController = new SessionController(CreateSessionUseCase)
 
-export {ListAllUsercontroller , CreateuserController , FindUserByEmailController , UpdatePasswordController , DeleteUserController , CreateSessionController};
+///End Session
+
+const EndSessionUseCase = new EndUseCase(UserRepositories);
+const EndSessionController = new EndController(EndSessionUseCase)
+
+
+export {ListAllUsercontroller , CreateuserController , FindUserByEmailController , UpdatePasswordController , DeleteUserController , CreateSessionController , EndSessionController};

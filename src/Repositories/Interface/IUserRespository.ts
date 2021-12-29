@@ -30,4 +30,5 @@ export interface IUserRepositoryInterface{
 
     createSession(id:string):Promise<PostgrestResponse<IUser>>
 
+    endSession(id:string):Promise<PostgrestResponse<IUser>>;
 }

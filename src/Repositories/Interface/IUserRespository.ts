@@ -1,34 +1,33 @@
 import { IUser } from './../../Models/IUserModel';
-import { PostgrestResponse } from "@supabase/supabase-js";
-import { IResponseUser } from '../../Interfaces/GlobalInterfaces';
+// import { IResponseUser } from '../../Interfaces/GlobalInterfaces';
 
-export interface IUpdatePassword{
-    oldPass:any,
-    id:string,
-    newHash:string
+export interface IUpdatePassword {
+  oldPass: any,
+  id: string,
+  newHash: string
 }
 
-interface IUserToDelete {
-    id:string,
-    password:number
-}
+// interface IUserToDelete {
+//   id: string,
+//   password: number
+// }
 
 
 
-export interface IUserRepositoryInterface{
-    listAll(): Promise<PostgrestResponse<IUser>> ;
+export interface IUserRepositoryInterface {
+  listAll(): Promise<IUser[]>;
 
-    createUser({email , id , name , avatar , password , lastname}:IUser): Promise<PostgrestResponse<IUser>>;
+  createUser({ email, id, name, password, lastname }: IUser): Promise<IUser | Error>;
 
-    findUserByEmail(email:string): Promise<PostgrestResponse<IUser>>;
+  findUserByEmail(email: string): Promise<IUser | undefined>;
 
-    updatePassword({id , oldPass , newHash}:IUpdatePassword):Promise<PostgrestResponse<IUser>>;
+  updatePassword(id: string, oldPass: string, newHash: string): Promise<boolean | undefined>;
 
-    deleteUser({id , password}:IUserToDelete):Promise<PostgrestResponse<IUser>>;
+  //     deleteUser({id , password}:IUserToDelete):Promise<PostgrestResponse<IUser>>;
 
-    findUserById(id:string):Promise<IUser | undefined>;
+  findUserById(id: string): Promise<IUser | undefined>;
 
-    createSession(id:string):Promise<PostgrestResponse<IUser>>
+  createSession(id: string): Promise<IUser>
 
-    endSession(id:string):Promise<PostgrestResponse<IUser>>;
+  //     endSession(id:string):Promise<PostgrestResponse<IUser>>;
 }

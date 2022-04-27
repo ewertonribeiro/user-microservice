@@ -1,9 +1,19 @@
-import {createClient} from '@supabase/supabase-js';
-import {config} from 'dotenv'
+import { Pool } from "pg"
+import { config } from 'dotenv'
 
 config()
 
-const SupabaseSecret =process.env.SUPABASE_SECRET_URL as string
-const SupabaseClient = process.env.SUPABASE_SECRET_KEY as string
+export const db = new Pool({
+  user: "postgres",
+  password: "postgres",
+  database: "aluraflix_users"
+})
 
-export const supabase = createClient(SupabaseSecret, SupabaseClient)
+export default async function connectDb() {
+  try {
+    await db.connect();
+    console.log("Db Connected");
+  } catch (error) {
+    console.log(error)
+  }
+}

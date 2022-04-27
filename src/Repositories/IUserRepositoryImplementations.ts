@@ -1,18 +1,16 @@
 import { IUser } from './../Models/IUserModel';
-import { IUserRepositoryInterface } from './Interface/IUserRespository';
-import { supabase } from '../DB/InitDB';
-import { PostgrestResponse } from '@supabase/supabase-js';
-import { IUpdatePassword  , } from './Interface/IUserRespository';
+import { IUpdatePassword, } from './Interface/IUserRespository';
 import { JWT } from '../Functions/JWT';
-import { IUserToDelete} from '../Interfaces/GlobalInterfaces'
+import { IUserToDelete } from '../Interfaces/GlobalInterfaces'
+import { IUserRepositoryInterface } from "./Interface/IUserRespository"
 
+import { db } from '../DB/InitDB';
 
+export class UserRepository implements IUserRepositoryInterface {
 
-export class UserRepository implements IUserRepositoryInterface{
-  
-    private static INSTANCE: UserRepository;
+  private static INSTANCE: UserRepository;
 
-    public static getInstance(): UserRepository{
+  public static getInstance(): UserRepository {
 
     if (!UserRepository.INSTANCE) {
 
@@ -21,117 +19,107 @@ export class UserRepository implements IUserRepositoryInterface{
     }
 
     return UserRepository.INSTANCE;
-}
+  }
 
 
-    async listAll(): Promise<PostgrestResponse<IUser>> {
-        
-        const users = await supabase.from<IUser>('Users')
-        .select("*")
+  async listAll(): Promise<IUser[]> {
 
-        return users
+    const users = await db.query<IUser>(`SELECT * FROM users;`)
+
+    return users.rows;
+  }
+
+  async createUser({ email, name, password, lastname }: IUser): Promise<IUser> {
+
+    const newUser = {} as IUser
+
+    const { userId, token } = JWT.SIGN()
+
+    Object.assign(newUser, {
+      id: userId,
+      email: email,
+      name: name,
+      lastname: lastname,
+      password: password,
+      token: token
+    })
+
+    await db.query<IUser>(`INSERT INTO users (name,lastname,email,password,token,id) VALUES('${newUser.name}','${newUser.lastname}','${newUser.email}','${newUser.password}','${newUser.token}','${newUser.id}');`);
+
+    const user = await db.query<IUser>(`SELECT * FROM users WHERE id='${userId}';`)
+
+    return user.rows[0]
+  }
+
+  async findUserByEmail(email: string): Promise<IUser | undefined> {
+
+    const query = await db.query<IUser>(`SELECT * FROM users WHERE email='${email}';`)
+
+    if (query.rowCount === 0) return undefined;
+
+    const user = query.rows[0]
+
+    return user;
+  }
+
+  async updatePassword(id: string, newHash: string, oldPass: string): Promise<boolean | undefined> {
+
+    const pass = oldPass as string
+
+    const query = await db.query<IUser>(`UPDATE users SET password = '${newHash}' WHERE id = '${id}';`)
+
+    if (query.rowCount === 0) return undefined;
+
+    return true;
+
+  }
+  // async deleteUser({ id }: IUserToDelete): Promise<PostgrestResponse<IUser>> {
+
+  //   try {
+
+  //     const user = await supabase.from<IUser>('Users')
+  //       .delete()
+  //       .match({ id: id })
+
+  //     return user
+  //   }
+  //   catch {
+  //     throw new Error(`Erro no repositorio`)
+  //   }
+
+  // }
+
+  async findUserById(id: string): Promise<IUser | undefined> {
+
+    const query = await db.query<IUser>(`SELECT * FROM users WHERE id='${id}';`);
+
+    const user = query.rows[0]
+
+    if (query.rowCount === 0) {
+      return undefined;
     }
 
-    async createUser({ email, name, avatar, password , lastname }:IUser): Promise<PostgrestResponse<IUser>> {
-        
-        const newUser = {} as IUser
+    return user
+  }
 
-        const {userId , token} = JWT.SIGN()
-        
-        Object.assign(newUser , {
-            id:userId,
-            email:email,
-            avatar,
-            name:name,
-            lastname:lastname,
-            password:password,
-            token:token
-        })
+  async createSession(id: string): Promise<IUser> {
 
-        const user = await supabase.from<IUser>('Users')
-        .insert([newUser])
-     
-
-        return user
-    }
-
-    async findUserByEmail( email : string): Promise<PostgrestResponse<IUser>> {
-        
-        
-        
-        const user = await supabase.from<IUser>('Users')
-        .select("*")
-        .match({email:email})
+    const newToken = JWT.newToken(id)
 
 
-        return user
-    }
+    await db.query<IUser>(`UPDATE users SET token='${newToken}' WHERE id='${id}';`);
 
-    async updatePassword({ id,newHash , oldPass}:IUpdatePassword ): Promise<PostgrestResponse<IUser>> {
+    const updated = await db.query<IUser>(`SELECT * FROM users WHERE id = '${id}';`);
+  
+    return updated.rows[0]
+  }
+  // async endSession(id: string): Promise<PostgrestResponse<IUser>> {
 
-        const pass = oldPass as string
-        const newPassword = await supabase.from<IUser>('Users')
-        .update({password:newHash})
-        .match({password:pass})
-        .eq("id" , id)
+  //   const data = await supabase.from<IUser>("Users")
+  //     .update({ token: null })
+  //     .match({ id: id })
 
-        return newPassword
+  //   return data
 
-    }
-    async deleteUser({ id }: IUserToDelete): Promise<PostgrestResponse<IUser>> {
-    
-        try{
-
-            const user = await supabase.from<IUser>('Users')
-                .delete()
-                .match({id:id})
-    
-            return user
-        }
-        catch{
-            throw new Error(`Erro no repositorio`)
-        }
-
-    }
-
-    async findUserById(id:string): Promise<IUser | undefined> {
-        
-        const {data} = await supabase.from<IUser>('Users')
-        .select("*")
-        .match({id:id})
-
-        const user = data?.find(user=>user);
-
-        // const Response = {
-        //     name:user?.name,
-        //     lastname:user?.lastname,
-        //     email:user?.email,
-        //     token:user?.token,
-        //     id:user?.id
-        // } as IResponseUser;
-        
-        return user
-    }
-
-    async createSession(id: string): Promise<PostgrestResponse<IUser>> {
-
-        const newToken = JWT.SIGN(id)
-
-        const updated= await supabase.from<IUser>('Users')
-        .update({token:newToken.token})
-        .match({id:id})
-
-
-
-        return updated
-    }
-    async endSession(id: string): Promise<PostgrestResponse<IUser>> {
-        
-        const data = await supabase.from<IUser>("Users")
-        .update({token:null})
-        .match({id:id})
-
-        return data
-
-    }
+  // }
 }

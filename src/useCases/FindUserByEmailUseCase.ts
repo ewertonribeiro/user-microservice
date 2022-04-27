@@ -9,18 +9,20 @@ export class FindUserByEmailUseCase{
 
     }
 
-    async execute(email:string):Promise<IResponseUser | null> {
+    async execute(email:string):Promise<IResponseUser | undefined> {
 
-        const {data} = await this.UserRepository.findUserByEmail(email)
+        const data = await this.UserRepository.findUserByEmail(email)
 
-        const user = data?.find(user=>user)
+        if(!data)return undefined;
+        
         const Response = {
-            name:user?.name,
-            lastname:user?.lastname,
-            email:user?.email,
-            token:user?.token
+            name:data.name,
+            lastname:data.lastname,
+            email:data.email,
+            id:data.id
         } as IResponseUser
-        return Response
+
+        return Response;
     }
 
 }

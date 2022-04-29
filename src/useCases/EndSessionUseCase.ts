@@ -1,52 +1,51 @@
 import { Password } from '../Functions/Password';
 import { UserRepository } from './../Repositories/IUserRepositoryImplementations';
 
-interface IRequest{
-    id:string,
-    password:number
+interface IRequest {
+  id: string,
+  password: string,
+  token: string
 }
 
-interface IResponse{
-    name:string,
-    status:string
+interface IResponse {
+  name: string,
+  status: string,
+  ok: boolean
 }
-export class EndSessionUseCase{
+export class EndSessionUseCase {
 
-    constructor(private UserRepository:UserRepository){}
+  constructor(private UserRepository: UserRepository) { }
 
-    async execute({password , id}:IRequest):Promise<IResponse>{
-
-
-        if(!password){
-            throw new Error("You must Provide a Password")
-        }
-        const pass = password.toString();
+  async execute({ password, id, token }: IRequest): Promise<IResponse> {
 
 
-            const user = await this.UserRepository.findUserById(id)
+    if (!password) throw new Error("You must Provide a Password")
 
-            if(!user){
-                throw new Error("User does Not Exists")
-            }
-    
-            const passCompare = await Password.Compare(pass , user.password)
+    const user = await this.UserRepository.findUserById(id)
 
-        if(!passCompare){
+    const passCompare = await Password.Compare(password, user?.password)
 
-            throw new Error("Password Invalid")
-        }
+    if (!passCompare) throw new Error("Password Invalid")
 
-        const {data}= await this.UserRepository.endSession(id)
+    if (user?.token != token) throw new Error("You must be logged as the user you want to Log out!");
 
-        const response = data?.find(user=>user);
+    const data = await this.UserRepository.endSession(id)
 
-
-        const IResponse = {
-            name:`${response?.name} ${response?.lastname}`,
-            status:"Token Deleted"
-        } as IResponse
-
-        return IResponse
-
+    if (!data) {
+      return {
+        ok: false,
+        name: `${user?.name}  ${user?.lastname}`,
+        status: "Erro in ending session"
+      } as IResponse;
     }
+
+    const IResponse = {
+      ok: true,
+      name: `${user?.name} ${user?.lastname}`,
+      status: "Token Deleted"
+    } as IResponse
+
+    return IResponse
+
+  }
 }

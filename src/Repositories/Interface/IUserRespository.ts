@@ -23,11 +23,11 @@ export interface IUserRepositoryInterface {
 
   updatePassword(id: string, oldPass: string, newHash: string): Promise<boolean | undefined>;
 
-  //     deleteUser({id , password}:IUserToDelete):Promise<PostgrestResponse<IUser>>;
+  deleteUser(id: string, password: string): Promise<boolean>;
 
   findUserById(id: string): Promise<IUser | undefined>;
 
   createSession(id: string): Promise<IUser>
 
-  //     endSession(id:string):Promise<PostgrestResponse<IUser>>;
+  endSession(id: string): Promise<boolean>;
 }

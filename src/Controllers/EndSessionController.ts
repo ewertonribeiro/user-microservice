@@ -3,31 +3,41 @@ import { EndSessionUseCase } from './../useCases/EndSessionUseCase';
 
 
 
-interface IRequest{
-    id:string,
-    token:string,
-    password:number
-} 
-interface IResponse{
-    name:string,
-    status:string
+interface IRequest {
+  id: string,
+  token: string,
+  password: string
 }
-export class EndSessionController{
+interface IResponse {
+  name: string,
+  status: string
+}
+export class EndSessionController {
 
-    constructor(private EndSessionUseCase:EndSessionUseCase){}
+  constructor(private EndSessionUseCase: EndSessionUseCase) { }
 
-    async handle(req:Request<unknown> , res:Response):Promise<Response<IResponse>>{
-        const {id} = req.params as IRequest
-        const {password} = req.body as IRequest
-        
-        try{
-            const user = await this.EndSessionUseCase.execute({password , id})
+  async handle(req: Request<unknown>, res: Response): Promise<Response<IResponse>> {
+    const { id } = req.params as IRequest
+    const { password } = req.body as IRequest
 
-            return res.status(200).json(user)
-        }
+    const bearer = req.headers.authorization
+    const token = bearer?.split(" ")[1]
 
-        catch(err){
-            return res.status(400).json(`${err}`)
-        }
+
+    try {
+      const user = await this.EndSessionUseCase.execute({ password, id, token })
+
+      if (user.ok) {
+
+        return res.status(200).json(user)
+      }
+
+      return res.status(400).json(user)
+
     }
+
+    catch (err: any) {
+      return res.status(400).json({ error: err.message })
+    }
+  }
 }

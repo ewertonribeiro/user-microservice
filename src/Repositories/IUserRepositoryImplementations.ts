@@ -44,6 +44,7 @@ export class UserRepository implements IUserRepositoryInterface {
       token: token
     })
 
+    console.log(newUser.id)
     await db.query<IUser>(`INSERT INTO users (name,lastname,email,password,token,id) VALUES('${newUser.name}','${newUser.lastname}','${newUser.email}','${newUser.password}','${newUser.token}','${newUser.id}');`);
 
     const user = await db.query<IUser>(`SELECT * FROM users WHERE id='${userId}';`)
@@ -64,7 +65,7 @@ export class UserRepository implements IUserRepositoryInterface {
 
   async updatePassword(id: string, newHash: string, oldPass: string): Promise<boolean | undefined> {
 
-    const pass = oldPass as string
+    // const pass = oldPass as string
 
     const query = await db.query<IUser>(`UPDATE users SET password = '${newHash}' WHERE id = '${id}';`)
 
@@ -73,21 +74,18 @@ export class UserRepository implements IUserRepositoryInterface {
     return true;
 
   }
-  // async deleteUser({ id }: IUserToDelete): Promise<PostgrestResponse<IUser>> {
+  async deleteUser(id: string): Promise<boolean> {
 
-  //   try {
 
-  //     const user = await supabase.from<IUser>('Users')
-  //       .delete()
-  //       .match({ id: id })
+    const query = await db.query<IUser>(`DELETE FROM users WHERE id = '${id}';`);
 
-  //     return user
-  //   }
-  //   catch {
-  //     throw new Error(`Erro no repositorio`)
-  //   }
+    if (query.rowCount === 0) return false;
 
-  // }
+
+    return true;
+
+
+  }
 
   async findUserById(id: string): Promise<IUser | undefined> {
 
@@ -110,16 +108,16 @@ export class UserRepository implements IUserRepositoryInterface {
     await db.query<IUser>(`UPDATE users SET token='${newToken}' WHERE id='${id}';`);
 
     const updated = await db.query<IUser>(`SELECT * FROM users WHERE id = '${id}';`);
-  
+
     return updated.rows[0]
   }
-  // async endSession(id: string): Promise<PostgrestResponse<IUser>> {
+  async endSession(id: string): Promise<boolean> {
 
-  //   const data = await supabase.from<IUser>("Users")
-  //     .update({ token: null })
-  //     .match({ id: id })
+    const query = await db.query(`UPDATE users SET token = NULL WHERE id = '${id}';`)
 
-  //   return data
+    if (query.rowCount === 0) return false;
 
-  // }
+    return true;
+
+  }
 }

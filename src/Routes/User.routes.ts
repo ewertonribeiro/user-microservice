@@ -28,12 +28,12 @@ userRoutes.delete("/delete/:id", UserMiddleware.userDoesNotExists, AuthMiddlewar
   DeleteUserController.handle(req, res)
 })
 
-userRoutes.get("/teste", async (req, res) => {
-  const pass = 80523333
-  const password = pass.toString()
-  const user = await Password.Compare("80523333", '$2b$08$GeyW1bpis3d2okMgKp1JJuiOoeHGRMHO5EGF1yhl2vNuMwi17yqxy')
+// userRoutes.get("/teste", async (req, res) => {
+//   const pass = 80523333
+//   const password = pass.toString()
+//   const user = await Password.Compare("80523333", '$2b$08$GeyW1bpis3d2okMgKp1JJuiOoeHGRMHO5EGF1yhl2vNuMwi17yqxy')
 
-  return res.json(user)
-})
+//   return res.json(user)
+// })
 
 

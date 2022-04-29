@@ -14,12 +14,15 @@ interface JWTResponse {
   token: string,
   userId: string
 }
-const userId = new ID()
+// const userId = new ID()
 
 export const JWT = {
-  SIGN(id?: string): JWTResponse {
+  SIGN(): JWTResponse {
+
+    const userId = new ID();
+
     const token = sign({}, 'ghghhdyryhfgwsyjtyweath', {
-      subject: !id ? userId.id : id,
+      subject: userId.id,
       expiresIn: '1d'
     })
     const UserAutenticate = {
@@ -28,11 +31,11 @@ export const JWT = {
     }
     return UserAutenticate
   },
-  newToken(id:string):string {
+  newToken(id: string): string {
 
-    const token = sign({},'ghghhdyryhfgwsyjtyweath',{
-      subject:id,
-      expiresIn:'1d'
+    const token = sign({}, 'ghghhdyryhfgwsyjtyweath', {
+      subject: id,
+      expiresIn: '1d'
     })
 
     return token

@@ -26,7 +26,6 @@ export const Password = {
 
         const passHash = await hash(pass , 8)
 
-
         return passHash
 
     }

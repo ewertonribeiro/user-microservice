@@ -4,7 +4,7 @@ import { UserRepository } from './../Repositories/IUserRepositoryImplementations
 interface IRequest {
   id: string,
   password: string,
-  token: string
+  token: string | undefined
 }
 
 interface IResponse {

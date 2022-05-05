@@ -1,20 +1,20 @@
-import { Pool } from "pg"
-import { config } from 'dotenv'
+import { Pool } from 'pg';
+import { config } from 'dotenv';
 
-config()
+config();
 
 export const db = new Pool({
-  user: process.env.POSTGRES_USER || "postgres",
-  password:process.env.POSTGRES_PASSWORD || "postgres",
-  database: process.env.POSTGRES_DB ||"aluraflix_users"
-  
-})
+  user: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  database: process.env.POSTGRES_DB,
+  host: process.env.HOST,
+});
 
 export default async function connectDb() {
   try {
     await db.connect();
-    console.log("Db Connected");
+    console.log('Db Connected');
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }

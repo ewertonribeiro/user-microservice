@@ -1,4 +1,4 @@
-import { IUser } from './../../Models/IUserModel';
+import { IUser } from '../../Models/IUserModel';
 // import { IResponseUser } from '../../Interfaces/GlobalInterfaces';
 
 export interface IUpdatePassword {
@@ -12,12 +12,12 @@ export interface IUpdatePassword {
 //   password: number
 // }
 
-
-
 export interface IUserRepositoryInterface {
   listAll(): Promise<IUser[]>;
 
-  createUser({ email, id, name, password, lastname }: IUser): Promise<IUser | Error>;
+  createUser({
+    email, id, name, password, lastname,
+  }: IUser): Promise<IUser | Error>;
 
   findUserByEmail(email: string): Promise<IUser | undefined>;
 

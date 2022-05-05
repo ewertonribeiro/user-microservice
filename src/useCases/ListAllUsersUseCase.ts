@@ -1,38 +1,29 @@
-import { IUser } from './../Models/IUserModel';
+import { IUser } from '../Models/IUserModel';
 import { UserRepository } from '../Repositories/IUserRepositoryImplementations';
 import { IResponseUser } from '../Interfaces/GlobalInterfaces';
 
-
 export class ListAllUsersUseCase {
-
-
-  constructor(private UserRepository: UserRepository) {
-
-  }
+  constructor(private UserRepository: UserRepository) {}
 
   async execute(): Promise<IResponseUser[] | Error> {
-
     try {
+      const data = await this.UserRepository.listAll();
 
-      const data = await this.UserRepository.listAll()
-
-
-      //Cria um novo array somente com as informacoes para exibir
-      const users = data.map(item => {
+      // Cria um novo array somente com as informacoes para exibir
+      const users = data.map((item) => {
         const response = {
           id: item.id,
           name: item.name,
           email: item.email,
-          lastname: item.lastname
+          lastname: item.lastname,
         } as IResponseUser;
 
         return response;
-      })
-
+      });
 
       return users;
     } catch (error: any) {
-      const err = new Error(error.message)
+      const err = new Error(error.message);
       return err;
     }
 
@@ -44,7 +35,5 @@ export class ListAllUsersUseCase {
     //     lastname:user?.lastname,
     //     token:user?.token
     // } as IResponseUser
-
   }
-
 }

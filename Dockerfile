@@ -1,8 +1,12 @@
-FROM node:16
+FROM node:alpine
 ENV PORT=5000
-COPY . /app
-WORKDIR /app/dist
+
+WORKDIR /app
+COPY package*.json ./
+
 RUN npm install
-RUN npm run build  
+COPY . .
+
 EXPOSE ${PORT}
-CMD [ "node","src/server.js" ]
+
+CMD [ "npm","run","dev" ]

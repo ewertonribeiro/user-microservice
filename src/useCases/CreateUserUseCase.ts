@@ -1,27 +1,33 @@
-import { IUser } from './../Models/IUserModel';
-import { UserRepository } from './../Repositories/IUserRepositoryImplementations';
-import { Password } from '../Functions/Password'
+import { IUser } from '../Models/IUserModel';
+import { UserRepository } from '../Repositories/IUserRepositoryImplementations';
+import { Password } from '../Functions/Password';
 
 interface IResponseUser {
-  name: string,
-  lastname: string,
-  email: string,
-  token: string,
-  id: string,
+  name: string;
+  lastname: string;
+  email: string;
+  token: string;
+  id: string;
 }
 
 export class CreateUserUseCase {
+  constructor(private UserRepository: UserRepository) {}
 
-  constructor(private UserRepository: UserRepository) {
-
-  }
-
-  async execute({ password, email, name, lastname }: IUser): Promise<IResponseUser | any> {
-
+  async execute({
+    password,
+    email,
+    name,
+    lastname,
+  }: IUser): Promise<IResponseUser | any> {
     try {
-      const hashPass = await Password.encrypt(password)
+      const hashPass = await Password.encrypt(password);
 
-      const user = await this.UserRepository.createUser({ name, email, password: hashPass, lastname });
+      const user = await this.UserRepository.createUser({
+        name,
+        email,
+        password: hashPass,
+        lastname,
+      });
 
       const Response = {
         email: user.email,
@@ -29,12 +35,11 @@ export class CreateUserUseCase {
         lastname: user.lastname,
         token: user.token,
         id: user.id,
-      } as IResponseUser
+      } as IResponseUser;
 
-      return Response
+      return Response;
     } catch (err: any) {
-      throw new Error(err.message)
+      throw new Error(err.message);
     }
-
   }
 }

@@ -1,49 +1,55 @@
-import { UserRepository } from './../Repositories/IUserRepositoryImplementations';
-import { Request, Response, NextFunction } from "express"
-import { verify } from 'jsonwebtoken'
+/* eslint-disable import/extensions */
+/* eslint-disable import/no-unresolved */
+/* eslint-disable consistent-return */
+/* eslint-disable eqeqeq */
+/* eslint-disable import/prefer-default-export */
+import { Request, Response, NextFunction } from 'express';
+import { verify } from 'jsonwebtoken';
+import { UserRepository } from '../Repositories/IUserRepositoryImplementations';
 
 interface IResponse {
-  sub: string
+  sub: string;
 }
 
-const Repository = UserRepository.getInstance()
+const Repository = UserRepository.getInstance();
 
 export const AuthMiddleware = {
-
   async token(req: Request, res: Response, next: NextFunction) {
-    const bearer = req.headers.authorization
+    const bearer = req.headers.authorization;
+    console.log(req.headers);
 
     if (!bearer) {
-      return res.status(400).json({ error: "This route is authenticated and you need to Provide a Token!" })
+      return res.status(400).json({ error: 'Credenciais Invalidas!' });
     }
-    const token = bearer.split(" ")
+    const token = bearer.split(' ');
 
     if (token.length === 1) {
-      return res.status(400).json({ error: "Token Missing!" })
+      return res.status(400).json({ error: 'Credenciais Invalidas!' });
     }
 
     try {
+      const tokenValid = verify(token[1], 'ghghhdyryhfgwsyjtyweath');
+      const { sub } = tokenValid as IResponse;
 
-      const tokenValid = verify(token[1], 'ghghhdyryhfgwsyjtyweath')
-      const { sub } = tokenValid as IResponse
+      const user = await Repository.findUserById(sub);
 
-      const user = await Repository.findUserById(sub)
+      if (!user) return res.status(400).json({ error: 'Acesso negado' });
 
+      if (user.id !== sub) {
+        return res.status(400).json({ error: 'Token invalido' });
+      }
 
-      if (!user) return res.status(400).json({ error: "User Invalid" })
+      if (!user.token) {
+        return res.status(400).json({ error: 'Token invalido!!!' });
+      }
 
-      if (user.id !== sub) return res.status(400).json({ error: "Token invalid" })
+      if (user.token != token[1]) {
+        return res.status(400).json({ error: 'Token invalido' });
+      }
 
-      if (!user.token) return res.status(400).json({ error: "This User does not have a token,you need to sign again!!!" })
-
-      if (user.token != token[1]) return res.status(400).json({ error: "The provided token is not valid anymore!" })
-
-      next()
+      next();
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message });
     }
-    catch (err: any) {
-      return res.status(400).json({ error: err.message })
-    }
-
   },
-
-}
+};

@@ -1,13 +1,13 @@
 export interface IUserToDelete {
-  id: string,
-  password: number | string
+  id: string;
+  password: number | string;
 }
 
 export interface IResponseUser {
-  name: string,
-  lastname: string,
-  email: string,
+  name: string;
+  lastname: string;
+  email: string;
   // token:string,
-  id: string,
+  id: string;
   // password:string
 }
